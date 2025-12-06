@@ -1,6 +1,6 @@
 import { Search, Calendar, MapPin, Filter, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { fetchEstados, fetchMunicipios } from '../services/ibgeService'
+import { fetchEstados, fetchMunicipios } from '../../services/ibgeService'
 
 interface FiltrosListaGeralProps {
   remetente: string
@@ -44,7 +44,7 @@ export default function FiltrosListaGeral({
 
   useEffect(() => {
     fetchEstados()
-      .then(estados => setUfs(estados.map(e => ({ sigla: e.sigla, nome: e.nome }))))
+      .then((estados: { sigla: string; nome: string }[]) => setUfs(estados.map((e: { sigla: string; nome: string }) => ({ sigla: e.sigla, nome: e.nome }))))
       .catch(() => {})
   }, [])
 
@@ -54,7 +54,7 @@ export default function FiltrosListaGeral({
       return
     }
     fetchMunicipios(uf)
-      .then(ms => setMunicipios(ms.map(m => m.nome)))
+      .then((ms: { nome: string }[]) => setMunicipios(ms.map((m: { nome: string }) => m.nome)))
       .catch(() => {})
   }, [uf])
 
