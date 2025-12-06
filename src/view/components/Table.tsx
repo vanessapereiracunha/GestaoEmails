@@ -3,7 +3,7 @@ export function Table({ children, className = '' }: { children: React.ReactNode,
 }
 
 export function TTable({ children }: { children: React.ReactNode }){
-  return <table className="min-w-full text-sm">{children}</table>
+  return <table className="min-w-full text-sm text-slate-800">{children}</table>
 }
 
 export function THead({ children }: { children: React.ReactNode }){
@@ -17,6 +17,6 @@ export function TRow({ children }: { children: React.ReactNode }){
 type TCellProps = React.TdHTMLAttributes<HTMLTableCellElement> & { header?: boolean }
 
 export function TCell({ children, header = false, className = '', ...rest }: TCellProps){
-  const base = header ? 'py-2 px-3 text-left font-medium' : 'py-2 px-3'
+  const base = header ? 'py-2 px-3 text-left font-medium text-slate-600' : 'py-2 px-3 text-slate-800'
   return <td className={`${base} ${className}`} {...rest}>{children}</td>
 }

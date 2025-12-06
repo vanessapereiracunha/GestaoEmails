@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from 'react'
-import type { Email } from '../types/email'
-import type { CreateEmailDto } from '../types/create-email.dto'
+import type { Email } from '../model/email'
+import type { CreateEmailDto } from '../model/create-email.dto'
 import { emailService } from '../services/emailService'
 
 interface EmailsContextValue {

@@ -1,5 +1,5 @@
 import { useEmailsContext } from '../../state/emails'
-import type { CreateEmailDto } from '../../types/create-email.dto'
+import type { CreateEmailDto } from '../../model/create-email.dto'
 
 export function useCadastrarEmail() {
   const { createManual } = useEmailsContext()

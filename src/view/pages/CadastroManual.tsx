@@ -1,10 +1,12 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
-import { useCadastrarEmail } from '../hooks/emails/useCadastrarEmail'
-import { useToast } from '../state/toast'
-import { fetchEstados, fetchMunicipios } from '../services/ibgeService'
+import { useNavigate } from 'react-router-dom'
+import { useCadastrarEmail } from '../../viewmodel/emails/useCadastrarEmail'
+import { useToast } from '../../state/toast'
+import { fetchEstados, fetchMunicipios } from '../../services/ibgeService'
 
 export default function CadastroManual(){
+  const navigate = useNavigate()
   const { cadastrar } = useCadastrarEmail()
   const { push } = useToast()
   const [ufs, setUfs] = useState<{ sigla: string, nome: string }[]>([])
@@ -48,50 +50,83 @@ export default function CadastroManual(){
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-full">
-        <h1 className="text-4xl font-bold text-gray-900 mb-12">Novo E-mail Manual</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-12">Novo E-mail Manual</h1>
         <div className="bg-white rounded-xl shadow-sm p-8 pb-16">
           <form onSubmit={onSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="col-span-2">
               <label className="block text-base font-medium text-gray-700 mb-2">Remetente</label>
-              <input name="remetente" placeholder="joao@empresa.com" className="border rounded-lg px-4 py-3 w-full text-base" required />
+              <input
+                name="remetente"
+                placeholder="joao@empresa.com"
+                className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+                required
+              />
             </div>
             <div className="col-span-2">
               <label className="block text-base font-medium text-gray-700 mb-2">Destinatário</label>
-              <input name="destinatario" placeholder="cliente@dominio.com" className="border rounded-lg px-4 py-3 w-full text-base" required />
+              <input
+                name="destinatario"
+                placeholder="cliente@dominio.com"
+                className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+                required
+              />
             </div>
             <div>
               <label className="block text-base font-medium text-gray-700 mb-2">Data / Hora</label>
-              <input type="datetime-local" name="dataHora" className="border rounded-lg px-4 py-3 w-full text-base" />
+              <input
+                type="datetime-local"
+                name="dataHora"
+                className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+              />
             </div>
             <div>
               <label className="block text-base font-medium text-gray-700 mb-2">Assunto</label>
-              <input name="assunto" placeholder="Assunto" className="border rounded-lg px-4 py-3 w-full text-base" />
+              <input
+                name="assunto"
+                placeholder="Assunto"
+                className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+              />
             </div>
             <div className="col-span-2">
               <label className="block text-base font-medium text-gray-700 mb-2">Corpo da Mensagem</label>
-              <textarea name="corpo" placeholder="Escreva a mensagem..." className="border rounded-lg px-4 py-3 w-full text-base" rows={8} />
+              <textarea
+                name="corpo"
+                placeholder="Escreva a mensagem..."
+                className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+                rows={8}
+              />
             </div>
-            <div>
-              <label className="block text-base font-medium text-gray-700 mb-2">Estado (UF)</label>
-              <select
-                name="uf"
-                className="border rounded-lg px-4 py-3 w-full text-base"
-                value={ufSelecionada}
-                onChange={e=> setUfSelecionada(e.target.value)}
-              >
-                <option value="">Selecione</option>
-                {ufs.map(uf=> <option key={uf.sigla} value={uf.sigla}>{uf.sigla} - {uf.nome}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-base font-medium text-gray-700 mb-2">Município</label>
-              <select name="municipio" className="border rounded-lg px-4 py-3 w-full text-base disabled:bg-gray-100" disabled={!ufSelecionada || municipios.length===0}>
-                <option value="">Selecione</option>
-                {municipios.map(m=> <option key={m} value={m}>{m}</option>)}
-              </select>
+            <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-2">Estado (UF)</label>
+                <select
+                  name="uf"
+                  className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900"
+                  value={ufSelecionada}
+                  onChange={e=> setUfSelecionada(e.target.value)}
+                >
+                  <option value="">Selecione</option>
+                  {ufs.map(uf=> <option key={uf.sigla} value={uf.sigla}>{uf.sigla} - {uf.nome}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-2">Município</label>
+                <select
+                  name="municipio"
+                  className="border rounded-lg px-4 py-3 w-full text-base bg-white text-slate-900 disabled:bg-gray-100"
+                  disabled={!ufSelecionada || municipios.length===0}
+                >
+                  <option value="">Selecione</option>
+                  {municipios.map(m=> <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
             </div>
             <div className="col-span-2 flex gap-3 justify-end mt-12">
-              <button type="button" className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors text-base">
+              <button
+                type="button"
+                onClick={() => navigate('/lista')}
+                className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors text-base"
+              >
                 Cancelar
               </button>
               <button type="submit" className="px-6 py-3 rounded-lg bg-indigo-600 text-white shadow hover:bg-indigo-700 transition-colors text-base">

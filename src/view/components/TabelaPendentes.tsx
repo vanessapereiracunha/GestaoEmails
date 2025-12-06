@@ -30,8 +30,8 @@ export default function TabelaPendentes({
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       {/* Cabeçalho da tabela */}
-      <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-        <div className="grid grid-cols-5 gap-4 text-sm font-semibold text-gray-700">
+      <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+        <div className="grid grid-cols-5 gap-4 text-sm font-semibold text-slate-800">
           <div>Remetente</div>
           <div>Destinatário</div>
           <div>Data</div>
@@ -56,7 +56,7 @@ export default function TabelaPendentes({
             </tbody>
           </table>
         ) : (
-          <div className="px-6 py-12 text-center text-gray-500">
+          <div className="px-6 py-12 text-center text-slate-500">
             <div className="text-sm">Nenhum e-mail pendente encontrado</div>
           </div>
         )}
@@ -64,18 +64,18 @@ export default function TabelaPendentes({
 
       {/* Paginação */}
       {emails.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200">
+        <div className="px-6 py-4 border-t border-slate-200">
           <div className="flex items-center justify-between">
             <button
               onClick={onPaginaAnterior}
               disabled={paginaAtual === 1}
-              className="h-10 px-4 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 inline-flex items-center gap-2"
+              className="h-10 px-4 bg-white border border-slate-300 text-slate-800 rounded-md hover:bg-slate-50 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-200 inline-flex items-center gap-2"
             >
               <ChevronLeft size={18} />
               Anterior
             </button>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-slate-700">
               Página {paginaAtual} de {totalPaginas}
             </div>
             

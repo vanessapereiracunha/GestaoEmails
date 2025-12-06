@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useListarEmails } from '../hooks/emails/useListarEmails'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect } from 'react'
+import { useFiltroListaGeral } from '../../viewmodel/emails/useFiltroListaGeral'
 import { Table, TTable, THead, TRow, TCell } from '../components/Table'
 import Pagination from '../components/Pagination'
 import EmptyState from '../components/EmptyState'
@@ -9,33 +9,20 @@ import Badge from '../components/Badge'
 import { X } from 'lucide-react'
 
 export default function ListaGeral(){
-  const { emails, loading } = useListarEmails()
-  const [q, setQ] = useState('')
-  const [debounced, setDebounced] = useState('')
-  const [dataIni, setDataIni] = useState('')
-  const [dataFim, setDataFim] = useState('')
-
-  useEffect(()=>{
-    const t = setTimeout(()=> setDebounced(q), 300)
-    return ()=> clearTimeout(t)
-  }, [q])
-
-  const filtered = useMemo(()=> {
-    return emails
-      .filter(e=> debounced ? (
-        e.remetente.toLowerCase().includes(debounced.toLowerCase()) ||
-        e.destinatario.toLowerCase().includes(debounced.toLowerCase()) ||
-        (e.assunto ?? '').toLowerCase().includes(debounced.toLowerCase())
-      ) : true)
-      .filter(e=> dataIni ? (new Date(e.dataHora) >= new Date(dataIni)) : true)
-      .filter(e=> dataFim ? (new Date(e.dataHora) <= new Date(dataFim)) : true)
-  }, [emails, debounced, dataIni, dataFim])
-
-  const [page, setPage] = useState(1)
-  const pageSize = 20
-  const start = (page - 1) * pageSize
-  const pageItems = filtered.slice(start, start + pageSize)
-  useEffect(()=>{ setPage(1) }, [debounced, dataIni, dataFim])
+  const {
+    loading,
+    q,
+    setQ,
+    dataIni,
+    setDataIni,
+    dataFim,
+    setDataFim,
+    filtered,
+    page,
+    setPage,
+    pageSize,
+    pageItems,
+  } = useFiltroListaGeral()
 
   const handleLimparFiltros = () => {
     setQ('')
@@ -45,13 +32,37 @@ export default function ListaGeral(){
 
   return (
     <div className="space-y-6 text-base">
-      <h1 className="text-3xl font-semibold">Histórico de E-mails</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-50">Histórico de E-mails</h1>
 
-      <div className="rounded-lg border bg-white p-4 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-4">
-          <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar por remetente, destinatário ou assunto" className="border rounded-md px-4 py-3 text-base col-span-3" />
-          <input type="date" value={dataIni} onChange={e=>setDataIni(e.target.value)} className="border rounded-md px-4 py-3 text-base" />
-          <input type="date" value={dataFim} onChange={e=>setDataFim(e.target.value)} className="border rounded-md px-4 py-3 text-base" />
+      <div className="rounded-lg border bg-white p-3 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 mb-3 text-sm items-end">
+          <div className="flex flex-col gap-1 col-span-3">
+            <label className="block text-xs font-medium text-slate-600">Busca</label>
+            <input
+              value={q}
+              onChange={e=>setQ(e.target.value)}
+              placeholder="Buscar por remetente, destinatário ou assunto"
+              className="border rounded-md px-4 h-11 text-base bg-white text-slate-900"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="block text-xs font-medium text-slate-600">Data inicial (dd/mm/aaaa)</label>
+            <input
+              type="date"
+              value={dataIni}
+              onChange={e=>setDataIni(e.target.value)}
+              className="border rounded-md px-4 h-11 text-base bg-white text-slate-900"
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="block text-xs font-medium text-slate-600">Data final (dd/mm/aaaa)</label>
+            <input
+              type="date"
+              value={dataFim}
+              onChange={e=>setDataFim(e.target.value)}
+              className="border rounded-md px-4 h-11 text-base bg-white text-slate-900"
+            />
+          </div>
         </div>
         <div className="flex justify-end">
           <button
@@ -95,7 +106,7 @@ export default function ListaGeral(){
             {!loading && pageItems.length === 0 && (
               <TRow>
                 <TCell className="py-6" colSpan={5 as any}>
-                  <EmptyState description="Ajuste a busca ou filtros para encontrar resultados." />
+                  <EmptyState description="Nenhum e-mail encontrado. Ajuste a busca ou filtros, ou aguarde nova ingestão." />
                 </TCell>
               </TRow>
             )}

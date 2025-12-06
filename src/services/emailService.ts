@@ -1,6 +1,6 @@
 import { getSupabase } from './supabase'
-import type { Email } from '../types/email'
-import type { CreateEmailDto } from '../types/create-email.dto'
+import type { Email } from '../model/email'
+import type { CreateEmailDto } from '../model/create-email.dto'
 
 export interface IEmailService {
   listAll(): Promise<Email[]>

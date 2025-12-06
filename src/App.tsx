@@ -1,10 +1,10 @@
 import { Route, Routes } from 'react-router-dom'
-import Layout from './components/Layout'
-import Dashboard from './pages/Dashboard'
-import Pendentes from './pages/Pendentes'
-import CadastroManual from './pages/CadastroManual'
-import ListaGeral from './pages/ListaGeral'
-import Detalhes from './pages/Detalhes'
+import Layout from './view/components/Layout'
+import Dashboard from './view/pages/Dashboard'
+import Pendentes from './view/pages/Pendentes'
+import CadastroManual from './view/pages/CadastroManual'
+import ListaGeral from './view/pages/ListaGeral'
+import Detalhes from './view/pages/Detalhes'
 
 export default function App() {
   return (

@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useListarEmails } from '../hooks/emails/useListarEmails'
-import { useClassificarEmail } from '../hooks/emails/useClassificarEmail'
-import { useToast } from '../state/toast'
-import { downloadCSV, toCSV } from '../utils/csv'
+import { useEffect, useState } from 'react'
+import { useFiltroPendentes } from '../../viewmodel/emails/useFiltroPendentes'
+import { useClassificarEmail } from '../../viewmodel/emails/useClassificarEmail'
+import { useToast } from '../../state/toast'
+import { downloadCSV, toCSV } from '../../utils/csv'
+
 import { Skeleton } from '../components/Skeleton'
 import EmptyState from '../components/EmptyState'
 import FiltrosPendentes from '../components/FiltrosPendentes'
@@ -10,37 +11,40 @@ import TabelaPendentes from '../components/TabelaPendentes'
 import { Download } from 'lucide-react'
 
 export default function Pendentes() {
-  const { emails, loading } = useListarEmails()
+  const {
+    pendentes,
+    loading,
+    remetente,
+    setRemetente,
+    dataIni,
+    setDataIni,
+    dataFim,
+    setDataFim,
+    page,
+    setPage,
+    pageSize,
+    pageItems,
+    totalPages,
+  } = useFiltroPendentes()
   const { classificar } = useClassificarEmail()
   const { push } = useToast()
-  const [remetente, setRemetente] = useState('')
-  const [dataIni, setDataIni] = useState('')
-  const [dataFim, setDataFim] = useState('')
   const [salvando, setSalvando] = useState(false)
-
-  const pendentes = useMemo(() => {
-    return emails
-      .filter(e => !e.classificado)
-      .filter(e => remetente ? e.remetente.toLowerCase().includes(remetente.toLowerCase()) : true)
-      .filter(e => dataIni ? (new Date(e.dataHora) >= new Date(dataIni)) : true)
-      .filter(e => dataFim ? (new Date(e.dataHora) <= new Date(dataFim)) : true)
-  }, [emails, remetente, dataIni, dataFim])
-
-  const [page, setPage] = useState(1)
-  const pageSize = 20
-  const start = (page - 1) * pageSize
-  const pageItems = pendentes.slice(start, start + pageSize)
-  const totalPages = Math.ceil(pendentes.length / pageSize)
-  
-  useEffect(() => { setPage(1) }, [remetente, dataIni, dataFim])
 
   const handleSalvar = async (id: string, uf: string, municipio: string) => {
     setSalvando(true)
     try {
       await classificar(id, uf, municipio)
-      push('E-mail classificado com sucesso!', 'success')
+      push({
+        variant: 'success',
+        title: 'E-mail classificado',
+        description: 'O e-mail foi classificado com sucesso.',
+      })
     } catch (error) {
-      push('Erro ao classificar e-mail', 'error')
+      push({
+        variant: 'error',
+        title: 'Erro ao classificar e-mail',
+        description: 'Não foi possível classificar este e-mail. Tente novamente.',
+      })
     } finally {
       setSalvando(false)
     }
@@ -56,7 +60,7 @@ export default function Pendentes() {
       municipio: p.municipio ?? '',
       classificado: p.classificado ? 'sim' : 'nao',
     })))
-    downloadCSV(csv, 'emails-pendentes.csv')
+    downloadCSV('pendentes.csv', csv)
   }
 
   const handleLimparFiltros = () => {
@@ -83,7 +87,7 @@ export default function Pendentes() {
       <div className="max-w-full">
         {/* Cabeçalho */}
         <div className="mb-16">
-          <h1 className="text-4xl font-bold text-gray-900">E-mails Pendentes</h1>
+          <h1 className="text-3xl font-bold text-gray-900">E-mails Pendentes</h1>
         </div>
 
         {/* Filtros */}

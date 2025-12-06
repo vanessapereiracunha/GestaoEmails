@@ -11,8 +11,14 @@ const client = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKe
 const GMAIL_CLIENT_ID = Deno.env.get('GMAIL_CLIENT_ID')
 const GMAIL_CLIENT_SECRET = Deno.env.get('GMAIL_CLIENT_SECRET')
 const GMAIL_REFRESH_TOKEN = Deno.env.get('GMAIL_REFRESH_TOKEN')
-const GMAIL_USER = Deno.env.get('GMAIL_USER') || 'me'
-const GMAIL_QUERY = Deno.env.get('GMAIL_QUERY') || '' // ex: cc:inbox@suaempresa.com newer_than:1d
+// GMAIL_USER deve ser explicitamente configurado para o e-mail institucional do sistema,
+// nunca para uma conta pessoal de colaborador.
+const GMAIL_USER = Deno.env.get('GMAIL_USER')
+// GMAIL_QUERY deve filtrar explicitamente apenas mensagens onde o e-mail do sistema
+// aparece em To/Cc (ex.: "cc:meusistema@gmail.com OR to:meusistema@gmail.com newer_than:7d").
+const GMAIL_QUERY = Deno.env.get('GMAIL_QUERY')
+// Permite explicitar o endereço do sistema; por padrão usa o próprio GMAIL_USER.
+const GMAIL_SYSTEM_ADDRESS = Deno.env.get('GMAIL_SYSTEM_ADDRESS') || GMAIL_USER
 
 async function getAccessToken() {
   const resp = await fetch('https://oauth2.googleapis.com/token', {
@@ -31,7 +37,7 @@ async function getAccessToken() {
 }
 
 async function listMessageIds(accessToken: string) {
-  const qs = new URLSearchParams({ q: GMAIL_QUERY, maxResults: '20' })
+  const qs = new URLSearchParams({ q: GMAIL_QUERY!, maxResults: '20' })
   const resp = await fetch(`https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(GMAIL_USER)}/messages?${qs}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
@@ -41,7 +47,7 @@ async function listMessageIds(accessToken: string) {
 }
 
 async function getMessage(accessToken: string, id: string) {
-  const resp = await fetch(`https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(GMAIL_USER)}/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Subject&metadataHeaders=Date`, {
+  const resp = await fetch(`https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(GMAIL_USER)}/messages/${id}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Subject&metadataHeaders=Date`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
   if (!resp.ok) throw new Error('get: ' + resp.status)
@@ -55,12 +61,30 @@ function headerValue(payload: any, name: string): string | null {
 
 async function upsertEmailFromGmail(msg: any) {
   const remetente = headerValue(msg.payload, 'From') ?? ''
-  const destinatario = headerValue(msg.payload, 'To') ?? ''
+  const to = headerValue(msg.payload, 'To') ?? ''
+  const cc = headerValue(msg.payload, 'Cc') ?? ''
   const assunto = headerValue(msg.payload, 'Subject') ?? ''
   const date = headerValue(msg.payload, 'Date')
   const dataHora = date ? new Date(date).toISOString() : new Date().toISOString()
   const corpo = msg.snippet ?? ''
   const idExt = msg.id
+
+  const system = (GMAIL_SYSTEM_ADDRESS || '').toLowerCase()
+  const toLower = to.toLowerCase()
+  const ccLower = cc.toLowerCase()
+  const fromLower = remetente.toLowerCase()
+
+  // Regra forte: só processa se o e-mail do sistema estiver em Cc
+  if (!system || !ccLower.includes(system)) {
+    return
+  }
+
+  // Opcional: evitar processar e-mails enviados pelo próprio sistema
+  if (fromLower.includes(system)) {
+    return
+  }
+
+  const destinatario = to || cc
 
   // naive de-duplication by external id stored in a dedicated column if you add it
   // For now, try to avoid exact duplicates by same sender+recipient+date+subject
@@ -84,7 +108,7 @@ async function upsertEmailFromGmail(msg: any) {
 
 export default async function handler(req: Request): Promise<Response> {
   try {
-    if (!client || !GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET || !GMAIL_REFRESH_TOKEN) {
+    if (!client || !GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET || !GMAIL_REFRESH_TOKEN || !GMAIL_USER || !GMAIL_QUERY) {
       return new Response('config', { status: 500 })
     }
     const token = await getAccessToken()

@@ -5,7 +5,7 @@ import App from './App'
 import './index.css'
 import { EmailsProvider } from './state/emails'
 import { ToastProvider } from './state/toast'
-import ToastContainer from './components/ToastContainer'
+import ToastContainer from './view/components/ToastContainer'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

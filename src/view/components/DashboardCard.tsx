@@ -4,7 +4,7 @@ interface DashboardCardProps {
   title: string
   value: number
   icon: LucideIcon
-  color?: 'blue' | 'green' | 'orange' | 'purple'
+  color?: 'blue' | 'green' | 'orange' | 'purple' | 'teal' | 'emerald' | 'amber'
 }
 
 export default function DashboardCard({ 
@@ -17,7 +17,10 @@ export default function DashboardCard({
     blue: 'bg-blue-50 text-blue-600',
     green: 'bg-green-50 text-green-600',
     orange: 'bg-orange-50 text-orange-600',
-    purple: 'bg-purple-50 text-purple-600'
+    purple: 'bg-purple-50 text-purple-600',
+    teal: 'bg-teal-50 text-teal-600',
+    emerald: 'bg-emerald-50 text-emerald-600',
+    amber: 'bg-amber-50 text-amber-600',
   }
 
   return (

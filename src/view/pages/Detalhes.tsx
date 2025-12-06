@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Email } from '../types/email'
-import { emailService } from '../services/emailService'
-import { useToast } from '../state/toast'
-import { fetchEstados, fetchMunicipios } from '../services/ibgeService'
+import type { Email } from '../../model/email'
+import { emailService } from '../../services/emailService'
+import { useToast } from '../../state/toast'
+import { fetchEstados, fetchMunicipios } from '../../services/ibgeService'
 
 export default function Detalhes(){
   const { id } = useParams()
@@ -29,17 +29,23 @@ export default function Detalhes(){
       await emailService.classificar(email.id, uf, municipio)
       await load()
       push({ variant: 'success', title: 'Local atualizado', description: 'UF e município salvos com sucesso.' })
+    } catch (err: any) {
+      push({
+        variant: 'error',
+        title: 'Erro ao salvar local',
+        description: err?.message || 'Não foi possível salvar UF e município. Tente novamente.',
+      })
     } finally { setSaving(false) }
   }
 
-  if (loading) return <div>Carregando...</div>
-  if (!email) return <div>Não encontrado</div>
+  if (loading) return <div className="text-sm text-slate-200">Carregando detalhes do e-mail...</div>
+  if (!email) return <div className="text-sm text-slate-200">E-mail não encontrado.</div>
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Detalhes do E-mail</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-50">Detalhes do E-mail</h1>
 
-      <div className="rounded-lg border bg-white p-5 shadow-sm space-y-2">
+      <div className="rounded-lg border bg-white p-5 shadow-sm space-y-2 text-slate-900">
         <Row label="Remetente" value={email.remetente} />
         <Row label="Destinatário" value={email.destinatario} />
         <Row label="Data" value={new Date(email.dataHora).toLocaleString()} />
@@ -47,8 +53,8 @@ export default function Detalhes(){
         <Row label="Localização" value={`${email.uf ?? '–'} - ${email.municipio ?? '–'}`} />
       </div>
 
-      <div className="rounded-lg border bg-white p-5 shadow-sm">
-        <h2 className="font-medium mb-3">Editar Local</h2>
+      <div className="rounded-lg border bg-white p-5 shadow-sm text-slate-900">
+        <h2 className="font-medium mb-3 text-slate-900">Editar Local</h2>
         <EditLocalForm
           defaultUF={email.uf ?? ''}
           defaultMunicipio={email.municipio ?? ''}
@@ -57,9 +63,9 @@ export default function Detalhes(){
         />
       </div>
 
-      <div className="rounded-lg border bg-white p-5 shadow-sm">
-        <h2 className="font-medium mb-2">Mensagem</h2>
-        <div className="whitespace-pre-wrap text-sm">{email.corpo ?? 'Sem corpo'}</div>
+      <div className="rounded-lg border bg-white p-5 shadow-sm text-slate-900">
+        <h2 className="font-medium mb-2 text-slate-900">Mensagem</h2>
+        <div className="whitespace-pre-wrap text-sm text-slate-800">{email.corpo ?? 'Sem corpo'}</div>
       </div>
     </div>
   )
@@ -69,7 +75,7 @@ function Row({ label, value }: { label: string, value: string }){
   return (
     <div className="grid grid-cols-3 gap-4">
       <div className="text-sm text-slate-600">{label}</div>
-      <div className="col-span-2">{value}</div>
+      <div className="col-span-2 text-slate-900">{value}</div>
     </div>
   )
 }
@@ -103,7 +109,7 @@ function EditLocalForm({ defaultUF, defaultMunicipio, onSubmit, saving }:{ defau
         <label className="block text-sm text-slate-600 mb-1">UF</label>
         <select
           name="uf"
-          className="border rounded-md px-3 py-2 w-full"
+          className="border rounded-md px-3 py-2 w-full bg-white text-slate-900"
           value={ufSelecionada}
           onChange={e=> setUfSelecionada(e.target.value)}
         >
@@ -115,7 +121,7 @@ function EditLocalForm({ defaultUF, defaultMunicipio, onSubmit, saving }:{ defau
         <label className="block text-sm text-slate-600 mb-1">Município</label>
         <select
           name="municipio"
-          className="border rounded-md px-3 py-2 w-full"
+          className="border rounded-md px-3 py-2 w-full bg-white text-slate-900 disabled:bg-slate-100"
           defaultValue={defaultMunicipio}
           disabled={!ufSelecionada || municipios.length===0}
         >

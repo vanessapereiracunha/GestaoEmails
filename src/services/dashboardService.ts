@@ -1,4 +1,4 @@
-import type { DashboardResumo } from '../types/dashboard'
+import type { DashboardResumo } from '../model/dashboard'
 import { emailService } from './emailService'
 
 export interface IDashboardService {
