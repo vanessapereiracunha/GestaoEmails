@@ -59,7 +59,9 @@ Centralizar e estruturar e-mails institucionais que hoje chegam em uma caixa de 
   - Chamadas periódicas à Edge Function `gmail-poll` via cron externo ou GitHub Actions (opcional).
 
 ---
+# Sistema de Gestão de E-mails – IFPI Hackathon
 
+> **Demo online:** https://gestao-emails.vercel.app/
 ## Por que este repositório não roda automaticamente ao clonar
 
 Este projeto foi pensado para um cenário real de produção/hackathon, com **integração a serviços externos**. 
