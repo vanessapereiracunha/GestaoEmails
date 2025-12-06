@@ -1,4 +1,4 @@
-name: Gmail Poll
+name: Gmail Poll v2
 on:
   schedule:
     - cron: '*/2 * * * *'  # a cada 2 minutos
