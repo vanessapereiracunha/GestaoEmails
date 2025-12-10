@@ -15,7 +15,7 @@ Sistema web desenvolvido para ingestão, classificação e análise de e-mails i
 - Acompanhar pendências e histórico.
 - Inserir e-mails manualmente.
 
-### ✨ Destaques do Projeto (Hackathon)
+### ✨ Destaques do Projeto 
 - Integração real com Gmail API (OAuth + refresh token).
 - Backend serverless usando Supabase Edge Functions.
 - Arquitetura limpa: View → ViewModel → Services → Model → State.
